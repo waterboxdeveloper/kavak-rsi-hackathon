@@ -13,6 +13,8 @@ RSI Hackathon · Kavak × OpenAI × Primero AI · 9 nov 2026
 | Si quieres… | Lee |
 |---|---|
 | **entender qué pedo es todo esto, desde cero** | **[docs/ENTENDER.md](docs/ENTENDER.md)** ← empieza aquí |
+| **nuestra propuesta, con la misma lupa** | [docs/NUESTRA-PROPUESTA.md](docs/NUESTRA-PROPUESTA.md) |
+| dónde sirve este patrón y dónde no (los 5 jueces gratis) | [docs/CASOS-DE-USO.md](docs/CASOS-DE-USO.md) |
 | saber si esto es un estándar, qué docs hay, y Codex vs Claude | [docs/ESTANDARES-Y-HERRAMIENTAS.md](docs/ESTANDARES-Y-HERRAMIENTAS.md) |
 | el mapa del repo y las reglas del proyecto | [PROYECTO.md](PROYECTO.md) |
 | la bitácora de cada paso con números reales | [docs/fases/](docs/fases/) |

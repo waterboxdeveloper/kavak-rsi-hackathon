@@ -1,0 +1,22 @@
+# --- secretos ---------------------------------------------------------------
+.env
+.env.*
+*.key
+
+# --- artefactos de corridas --------------------------------------------------
+# Las corridas se regeneran con `make demo`. NO versionamos ruido.
+# EXCEPCION: runs/evidencia/ guarda a mano las corridas que citamos en la demo.
+runs/*
+!runs/.gitkeep
+!runs/evidencia/
+
+# --- python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# --- sistema ----------------------------------------------------------------
+.DS_Store

@@ -1,13 +1,20 @@
-"""PASO 3 del loop: CONSTRUIR EL SUCESOR (con Codex).
+"""PASO 3 del loop: CONSTRUIR EL SUCESOR (con un agente de codigo).
 
-Aqui Codex no es nuestro copiloto: es el organo de construccion del sistema.
-Este script arma el prompt con (codigo del predecesor + lecciones activas +
-tests rojos) e invoca `codex exec` para que escriba la version siguiente.
+Aqui el agente de codigo no es nuestro copiloto: es el organo de construccion
+del sistema. Este script arma el prompt con (codigo del predecesor + lecciones
+activas + tests rojos) y lo manda a construir.
 
   python3 loop/build.py --from v0 --to v1
-  python3 loop/build.py --from v1 --to v2 --print-prompt   # solo imprime
+  python3 loop/build.py --from v1 --to v2 --print-prompt      # solo imprime
+  python3 loop/build.py --from v0 --to v1 --builder claude    # el otro agente
 
-Si `codex` no esta instalado, guarda el prompt en runs/ para pegarlo a mano.
+OJO, y esto es lo importante de entender: el constructor es INTERCAMBIABLE.
+Lo unico que lo acopla al sistema son las 3 lineas de BUILDERS de abajo: un
+subproceso que recibe texto y escribe archivos. Codex y Claude Code son
+sustituibles sin tocar nada mas; el valor del proyecto esta en el banco de
+casos, la evidencia y los tests, no en cual CLI invocamos.
+
+Si el CLI no esta instalado, guarda el prompt en runs/ para pegarlo a mano.
 Eso tambien cuenta, pero hay que decirlo en la demo: "aqui hubo intervencion
 humana" (la rubrica pide distinguirlo).
 """
@@ -21,6 +28,25 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+# El constructor, intercambiable. Cada entrada devuelve el comando a ejecutar.
+#
+# Verificado contra codex-cli 0.150.0 el 9 nov 2026: `codex exec` NO acepta
+# --full-auto (lo rechaza al parsear); el flag correcto para que pueda escribir
+# archivos es --sandbox workspace-write. Si cambias de version, revisa primero
+# `codex exec --help`.
+BUILDERS = {
+    "codex": lambda prompt, model: (
+        ["codex", "exec", "--sandbox", "workspace-write"]
+        + (["--model", model] if model else [])
+        + [prompt]
+    ),
+    "claude": lambda prompt, model: (
+        ["claude", "-p", "--permission-mode", "acceptEdits"]
+        + (["--model", model] if model else [])
+        + [prompt]
+    ),
+}
 
 CONTRATO = """CONTRATO (obligatorio):
 - Archivo a escribir: agents/{to}/agent.py
@@ -60,6 +86,7 @@ def build_prompt(src, dst):
         )
 
     tools = sorted(p.name for p in (ROOT / "agents" / "common" / "tools").glob("*.py"))
+    n_lessons = len(lessons)
 
     return f"""Eres el constructor de la siguiente version de un sistema de ingesta de
 anuncios de autos usados. Tu trabajo es escribir {dst} a partir de {src} mas las
@@ -80,13 +107,15 @@ Utilidades disponibles que SI debes reutilizar:
 - agents/common/constants.py  -> USD_MXN, MILES_TO_KM, MODEL_YEARS
 - store.find_by_vin(vin), store.save(record), store.confirm(case_id)
 
-## Lecciones a heredar ({len(lessons)})
+## Lecciones a heredar ({n_lessons})
 {chr(10).join(bloques) or "(ninguna)"}
 
 ## Criterio de exito
-Al terminar, estos comandos deben pasar:
-  RSI_AGENT={dst} python3 -m pytest tests/ -q
-  python3 agents/run.py --version {dst} --split holdout && python3 bench/score.py runs/{dst}-holdout.json
+Al terminar, estos comandos deben pasar (pytest NO esta instalado; usa el
+corredor del repo, que no tiene dependencias):
+  RSI_AGENT={dst} python3 run_tests.py        # los {n_lessons} tests deben quedar VERDES
+  python3 agents/run.py --version {dst} --split holdout
+  python3 bench/score.py runs/{dst}-holdout.json
 
 Escribe los archivos directamente. Explica en 3 lineas que cambio y por que.
 """
@@ -97,7 +126,9 @@ def main():
     ap.add_argument("--from", dest="src", default="v0")
     ap.add_argument("--to", dest="dst", default="v1")
     ap.add_argument("--print-prompt", action="store_true")
-    ap.add_argument("--model", default="gpt-5-codex")
+    ap.add_argument("--builder", default="codex", choices=sorted(BUILDERS))
+    ap.add_argument("--model", default=None,
+                    help="opcional; por default usa el modelo configurado en el CLI")
     args = ap.parse_args()
 
     prompt = build_prompt(args.src, args.dst)
@@ -112,18 +143,22 @@ def main():
         print("\n" + prompt)
         return
 
-    if not shutil.which("codex"):
-        print("\n!! `codex` no esta en el PATH.")
-        print("   Instala el CLI (npm i -g @openai/codex) o pega el prompt a mano:")
-        print(f"   cat {dest.relative_to(ROOT)}")
+    if not shutil.which(args.builder):
+        print(f"\n!! `{args.builder}` no esta en el PATH.")
+        print("   Opciones: instalar el CLI, usar --builder con el otro agente,")
+        print(f"   o pegar el prompt a mano:  cat {dest.relative_to(ROOT)}")
         print("   Si lo pegas a mano, dilo en la demo: hubo intervencion humana.")
         return
 
-    print(f"invocando Codex ({args.model}) para construir {args.dst}...\n")
-    subprocess.run(
-        ["codex", "exec", "--model", args.model, "--full-auto", prompt],
-        cwd=ROOT, check=False,
-    )
+    cmd = BUILDERS[args.builder](prompt, args.model)
+    print(f"invocando {args.builder} ({args.model or 'modelo por default'}) "
+          f"para construir {args.dst}...\n")
+    # El prompt es largo, asi que mostramos el comando sin el (ultimo elemento).
+    print(f"  $ {' '.join(cmd[:-1])} <prompt>\n")
+    result = subprocess.run(cmd, cwd=ROOT, check=False)
+    print(f"\n{args.builder} termino con codigo {result.returncode}")
+    print("Ahora verifica que no toco la vara de medir:")
+    print("  git status --short bench/ lessons/ tests/ agents/v0/")
 
 
 if __name__ == "__main__":

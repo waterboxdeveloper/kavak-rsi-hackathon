@@ -441,5 +441,8 @@ Para que los reconozcas cuando los leas en un paper o en una junta:
 
 ---
 
-**Siguiente lectura:** [PROYECTO.md](../PROYECTO.md) para el mapa del repo, y
-[docs/fases/](fases/) para la bitácora de cada paso con sus números reales.
+**Siguiente lectura:**
+- [ESTANDARES-Y-HERRAMIENTAS.md](ESTANDARES-Y-HERRAMIENTAS.md) — ¿esto es un
+  estándar? ¿qué documentación oficial existe? ¿por qué Codex y no Claude?
+- [PROYECTO.md](../PROYECTO.md) — el mapa del repo y las reglas.
+- [fases/](fases/) — la bitácora de cada paso con sus números reales.

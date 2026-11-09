@@ -2,8 +2,25 @@
 
 | | |
 |---|---|
-| **Estado** | ⬜ pendiente |
-| **Depende de** | V2 funcionando |
+| **Estado** | ✅ ablation verificado con 4 lecciones · demo pendiente de ensayar |
+| **Depende de** | V1 funcionando ✅ |
+
+## ✅ Ablation: resultado real, verificado caso por caso
+
+V1 completa: **19/20** en holdout. Apagando una sola lección:
+
+| Lección apagada | Marcador | Caen | Casos que caen | Casos con ese defecto en holdout | ¿Cuadra? |
+|---|---|---|---|---|---|
+| **L1** sufijo k en km | 16/20 | 3 | C042, C047, C057 | C042, C047, C057 | ✅ exacto |
+| **L2** precio en USD | 16/20 | 3 | C042, C048, C057 | C042, C048, C057 | ✅ exacto |
+| **L3** checksum de VIN | 16/20 | 3 | C044, C049, C059 | C044, C049, C059 | ✅ exacto |
+| **L5** millas a km | 16/20 | 3 | C045, C051, C060 | C045, C051, C060 | ✅ exacto |
+
+**Las cuatro con atribución exacta: ni un caso de más, ni uno de menos.** El
+conteo no se infirió, se comparó contra `bench/cases.jsonl` con un script.
+
+Esto es la respuesta literal a *"¿cómo aislaron el efecto del cambio?"*. Si el
+jurado pide otra lección, se corre en vivo: `make ablate L=L4 V=v1`.
 
 ## Objetivo
 Probar que la mejora vino **de las lecciones** y no de la suerte, y dejar la

@@ -74,10 +74,15 @@ listo). Las otras seis no: son el sistema.
 Esto es lo que el sistema "sabe" hoy, y está en un archivo de texto que puedes
 abrir:
 
-| | Lecciones | Qué aprendió |
-|---|---|---|
-| De V0 | **L1 – L9** | leer kilometraje (sufijo k, millas, punto de miles), leer precio (USD, k, punto), validar checksum de VIN, detectar salvamento, detectar año imposible |
-| De V1 | **L10 – L11** | no dar de alta dos veces el mismo VIN · confirmar sólo después de persistir |
+| | Lecciones | Estado | Qué aprendió |
+|---|---|---|---|
+| De V0 | **L1 – L9** | ✅ aprendidas y heredadas por V1, 9 tests en verde | leer kilometraje (sufijo k, millas, punto de miles), leer precio (USD, k, punto), validar checksum de VIN, detectar salvamento, detectar año imposible |
+| De V1 | **L10 – L11** | ⏸️ **diferidas** — identificadas con su razón, no aprendidas | no dar de alta dos veces el mismo VIN · confirmar sólo después de persistir |
+
+> **Cerramos en V1 a propósito.** El único caso que V1 no resuelve es el del
+> VIN duplicado, que es precisamente una de esas dos lecciones diferidas. Lo
+> que falta no es un hueco: es la siguiente tarea **ya nombrada por el propio
+> sistema**. Ver [DECISIONES.md](DECISIONES.md) D17.
 
 Y cada una existe en **tres lugares al mismo tiempo**, lo que es justo lo que
 impide que se pierda:

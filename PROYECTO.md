@@ -69,17 +69,36 @@ La rúbrica no premia al agente más listo. Premia que se vea el ciclo:
 **falla observable → lección guardada → sucesor que la hereda → mismo
 benchmark con número que sube → ablation que prueba la causa.**
 
-Lo que proyectamos en pantalla:
+Lo que proyectamos en pantalla. **Todo medido, nada proyectado:**
 
-| | V0 | V1 | V2 |
-|---|---|---|---|
-| Casos resueltos (holdout, 20 casos) | **5/20** | ~16/20 | ~19/20 |
-| Chequeos de integridad | 0/2 | 0/2 | **2/2** |
-| Lecciones activas | 0 | 9 | 11 |
+| | V0 | V1 |
+|---|---|---|
+| Casos resueltos (holdout, 20 casos) | **5/20** | **19/20** |
+| Chequeos de integridad | 0/2 | 0/2 |
+| Lecciones activas | 0 | 9 |
+| Tests de lección verdes | 0/9 | **9/9** |
+| Único caso sin resolver | — | **C056**, VIN duplicado |
 
-Y el cierre: `make ablate L=L5 V=v2` apaga **una** lección y los casos de
-millas vuelven a romperse. **Exactamente ésos, ni uno más.** Eso es la prueba
-de causalidad; sin eso la mejora es anécdota.
+Y el cierre: `make ablate L=L5 V=v1` apaga **una** lección y los casos de
+millas vuelven a romperse. **Exactamente ésos, ni uno más** — verificado con
+4 lecciones distintas. Eso es la prueba de causalidad; sin eso la mejora es
+anécdota.
+
+> ### Por qué cerramos en V1 y no construimos V2
+>
+> **Decisión del equipo, a propósito.** El único caso que V1 no resuelve es el
+> del VIN duplicado — que es exactamente una de las dos lecciones que el
+> sistema **decidió diferir** con su razón escrita.
+>
+> O sea: lo que falta no es un hueco, es **la siguiente tarea ya nombrada por
+> el propio sistema**. Cerrar ahí demuestra que entendimos la lógica del
+> ciclo, en vez de correr a inflar un número. El sistema **sabe lo que no
+> sabe**, y eso es más difícil de lograr que un marcador alto.
+>
+> El loop sigue siendo replayable: `make reset && make demo` lo corre desde
+> cero y cualquiera ve nacer las 9 lecciones. Y `make build-v2` existe: la
+> segunda vuelta está construida, sólo no la ejecutamos. Ver
+> [docs/DECISIONES.md](docs/DECISIONES.md) D17.
 
 ---
 

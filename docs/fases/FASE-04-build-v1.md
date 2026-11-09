@@ -2,8 +2,10 @@
 
 | | |
 |---|---|
-| **Estado** | ⬜ pendiente (es el siguiente paso) |
-| **Archivos** | `loop/build.py` → genera `agents/v1/agent.py` y `agents/common/tools/*` |
+| **Estado** | ✅ hecha, en dos intentos |
+| **Archivos** | `agents/v1/agent.py` + `agents/common/tools/{odometer,money,validators}.py` |
+| **Commits** | `68b99b3` primer intento (se pasó de listo) · `82ad0e0` reconstrucción |
+| **Resultado** | holdout **5/20 → 19/20** · tests de lección **0/9 → 9/9 verdes** |
 
 ## Objetivo
 Que **Codex**, no nosotros, escriba el agente sucesor a partir del código de
@@ -93,25 +95,90 @@ puerta a la FASE-05.
 
 ---
 
-## ⬇️ A llenar al terminar
+## ✅ Resultado real
 
-**Hora:** · **Commit:** · **Intentos de Codex:**
+**Intentos de Codex: 2.** El primero se pasó de listo.
 
-**Salida real de `make test`:**
+### Intento 1 — `68b99b3` · descartado aunque sacó 20/20
+
+Codex escribió los 4 archivos con las 9 guardas de ablation correctas y **no
+tocó la vara de medir**. Pero implementó además el dedupe por VIN y el
+confirm-after-save, o sea las lecciones **L10 y L11 que estaban diferidas y no
+venían en el prompt**. Resultado: holdout 20/20, integridad 2/2.
+
+Lo descartamos, y hay que poder explicar por qué un número mejor fue peor:
+
+| Problema | Consecuencia |
+|---|---|
+| No queda nada que V2 pueda aprender | se cae la cadena y el criterio de acumulación |
+| Esos 2 comportamientos no tienen interruptor | no se pueden apagar ni atribuir → mejora sin evidencia |
+| Salto de 5/20 a 20/20 de un golpe | frente a un jurado técnico eso genera sospecha, no aplauso |
+
+**Causa raíz, y fue nuestra:** el prompt protegía la vara de medir
+(`bench/`, `lessons/`, `tests/`) pero **no protegía la evidencia**. Nunca dijo
+"no implementes nada que no tenga lección".
+
+### El arreglo — sección FRONTERA en `loop/build.py`
+
+> *"Si detectas otros bugs en el predecesor, DÉJALOS INTACTOS. No son
+> descuidos: son fallas que el sistema todavía no ha aprendido, y arreglarlas
+> antes de que exista su lección destruye la evidencia."*
+
+### Intento 2 — `82ad0e0` · el bueno
+
+Verificado en el código, no de palabra:
+
+- `grep find_by_vin agents/v1/agent.py` → **0 resultados** (no deduplica)
+- `store.confirm()` en la línea 83, `store.save()` en la 85 → **conservó el bug
+  de proceso de V0 aunque lo tenía enfrente**
+- 9 guardas `if "Lx" in lessons:` → una por lección
+- `git status --short bench/ lessons/ tests/ agents/v0/` → **vacío**
+
+**Salida de `make test`:**
 ```
+== tests de leccion (agente bajo prueba: v1) ==
+  VERDE L1 ... VERDE L9
+  9 verdes / 0 rojos
 ```
 
-**Salida real de `make v1`:**
+**Salida de `make v1`:**
 ```
+== v1  (split=holdout) ==
+  casos resueltos : 19/20
+    holdout       : 19/20  <- el numero que presentamos
+  integridad      : 0/2
+    [FALLA] no_duplicate_inventory {'7JJHHPGG2VFBFF9JC': ['C043', 'C056']}
+    [FALLA] no_phantom_confirmation ['C051']
 ```
 
-**¿Qué escribió Codex exactamente?** (`git show --stat`)
+### El detalle que hace a esta fase
 
-**¿Tocó algo prohibido?**
+**El único caso que V1 no resuelve es `C056`: VIN duplicado.** Y las dos
+fallas de integridad que quedan son exactamente las dos lecciones diferidas.
 
-**Intervención humana:**
+Lo que falta es precisamente lo que el sistema ya identificó como su siguiente
+lección. **La frontera funcionó.**
 
-**Qué salió mal / qué aprendimos:**
+## Intervención humana
+
+Dos, y en puntos exactos:
+
+1. **Escribimos la sección FRONTERA** del contrato, después de ver el primer
+   intento. Ningún sistema nos lo pidió.
+2. **Borramos el V1 del primer intento** y relanzamos el build.
+
+El código de V1 lo escribió Codex en los dos casos. Nosotros no editamos una
+línea de `agents/v1/agent.py` ni de las herramientas.
+
+## Qué salió mal / qué aprendimos
+
+**Un constructor obediente no es lo mismo que un constructor acotado.** Codex
+incluso *avisó* que no iba a tocar las fallas de proceso — y las tocó. La
+lección no es "el modelo miente": es que **un contrato tiene que prohibir
+explícitamente lo que no quieres**, porque lo que no está prohibido se vuelve
+una optimización razonable desde el punto de vista del constructor.
+
+Eso aplica a cualquier agente con permiso de escribir código.
 
 ## Siguiente
 [FASE-05 — segunda iteración → V2](FASE-05-build-v2.md)

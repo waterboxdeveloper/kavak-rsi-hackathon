@@ -94,7 +94,7 @@ Evidencia a la mano: `runs/build-prompt-v0-to-v1.md` (el prompt exacto) y
 | Cómo se **guardó** la lección | Regla + función donde debe vivir + **un test generado que nace rojo** | `lessons/lessons.jsonl`, `tests/` |
 | Cómo se **incorporó** | El prompt de construcción lleva cada lección con su id, y el sucesor debe envolver el comportamiento en `if "Lx" in lessons:` | `loop/build.py` |
 | Una **lección concreta** | L5: millas → km. Vive en una función, en un test y en un interruptor | `tests/test_lesson_L5.py` |
-| **Qué se acumuló** | 9 lecciones de V0; las 2 de proceso quedaron diferidas y nacen de V1 → 11 en V2 | `lessons/lessons.jsonl` |
+| **Qué se acumuló** | 9 lecciones de V0, heredadas por V1 y fijadas con sus 9 tests en verde. Las 2 de proceso **siguen diferidas a propósito**: son la tarea que el loop dejó nombrada | `lessons/lessons.jsonl` |
 
 **La parte creativa que hay que contar sí o sí:** el sistema **se negó a
 aprender** las dos fallas de proceso mientras había 38 casos de ruido de
@@ -115,9 +115,19 @@ cadena de versiones sin que nosotros la guionáramos.
 
 ## Autoevaluación honesta
 
-| Criterio | Cómo vamos | Hueco |
+| Criterio | Cómo vamos | Hueco, dicho de frente |
 |---|---|---|
-| 1 · Impacto | sólido: holdout real y «qué sigue fallando» automático | el banco es sintético |
-| 2 · Codex | sólido: es el constructor, no el copiloto, y tenemos el hallazgo | — |
-| 3 · Habilidades | sólido: lección → función → test → interruptor, más las diferidas | el repertorio de reglas es humano |
-| 4 · Demo | pendiente de ensayar con cronómetro | V2 aún no existe |
+| 1 · Impacto | sólido: `5/20 → 19/20` en holdout real, el impacto en OPEX explicado en el README, y «qué sigue fallando» impreso automáticamente | el banco es sintético |
+| 2 · Codex | sólido: es el constructor, no el copiloto, y tenemos el hallazgo del V1 que se pasó de listo | — |
+| 3 · Habilidades | sólido: lección → función → test → interruptor, más la decisión de diferir | el repertorio de reglas es humano |
+| 4 · Demo | ablation verificado con 4 lecciones, todas con atribución exacta | **falta ensayar con cronómetro** |
+
+**La única cosa que falta de verdad es ensayar.** Todo lo demás está medido y
+escrito. Ver [`docs/demo/PITCH.md`](../demo/PITCH.md), sección Modo Ensayo.
+
+**Sobre el criterio 3 y V2:** la rúbrica dice *"si el sucesor vuelve a aprender
+y crea otra versión, muestren qué se acumuló"* — nota el **si**. Decidimos
+cerrar en V1 porque el único caso que falla es precisamente una de las dos
+lecciones diferidas: lo que falta no es un hueco, es la siguiente tarea ya
+nombrada por el sistema. El comando de la segunda vuelta existe y funciona
+(`make build-v2`). Registro completo en [DECISIONES.md](../DECISIONES.md) D17.

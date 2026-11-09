@@ -97,15 +97,17 @@ archivo, se copian y se pegan. Nadie teclea en vivo bajo presión.
 
 ---
 
-## 2:20 – 3:00 · Acumulación y la prueba
+## 2:20 – 3:00 · La prueba, y la tarea que queda nombrada
 
 **Teclear:** `make report`
 
-> «Sin el ruido de extracción, las dos fallas de proceso quedaron aisladas y
-> nacieron dos lecciones nuevas. V2 hereda once.
+> "De cinco a diecinueve de veinte, sobre los mismos veinte casos que el
+> sistema nunca vio al aprender.
 >
-> **V2 no lee mejor que V1: trabaja mejor.** Ahí está el salto de integridad,
-> de cero a dos. Dejó de duplicar autos y dejó de mentirle al cliente.»
+> Y fíjense en el único que **no** resuelve: el del VIN duplicado. Es
+> precisamente una de las dos lecciones que el sistema decidió diferir.
+> **El loop no se quedó sin trabajo: se quedó con una tarea nombrada.**
+> Sabe lo que no sabe, y sabe por qué todavía no lo aprendió."
 
 **Teclear:** `make ablate L=L5 V=v1`
 
@@ -123,37 +125,48 @@ archivo, se copian y se pegan. Nadie teclea en vivo bajo presión.
 ---
 ---
 
-## ⚠️ Si V2 no se alcanza a construir
+## ✅ Decisión del equipo: el pitch cierra en V1
 
-Sustituir el bloque de 2:20 por esto. **No inventar números de V2.**
+**No construimos V2, y es a propósito.** La narrativa de cerrar en V1 demuestra
+que entendimos la lógica del sistema, en vez de correr a inflar un número:
 
-> «V1 todavía tiene los dos bugs de proceso vivos, y eso es correcto: sus
-> lecciones están diferidas esperando esta segunda vuelta. El único caso que
-> V1 no resuelve es precisamente el del VIN duplicado. **Lo que falta es
-> exactamente lo que el sistema ya identificó como su siguiente lección**, y
-> eso es lo que nos interesaba mostrar: el loop no se quedó sin trabajo, se
-> quedó con una tarea nombrada.»
+- El único caso que V1 no resuelve es el del **VIN duplicado**, que es
+  exactamente una de las dos lecciones que el sistema **decidió diferir**.
+- O sea: lo que falta no es un hueco, es **la siguiente tarea, ya nombrada por
+  el propio sistema y con su razón escrita**.
+- Eso enseña algo más difícil que un número alto: **el sistema sabe lo que no
+  sabe.**
 
-Es una versión honesta y sigue siendo fuerte: enseña que el sistema **sabe lo
-que no sabe**.
+Si alguien pregunta por qué no hay V2, la respuesta es ésa, y se dice sin
+disculparse. **Nada en este pitch afirma números que no medimos.**
 
 ---
 
 ## Números reales, para no equivocarse en vivo
 
-| | V0 | V1 | V2 |
-|---|---|---|---|
-| Casos resueltos (holdout, 20) | **5/20** ✅medido | **19/20** ✅medido | pendiente |
-| Integridad | 0/2 | 0/2 | pendiente |
-| Lecciones activas | 0 | 9 | 11 |
-| Tests de lección verdes | 0/9 | **9/9** ✅medido | pendiente |
+**Todo lo de abajo está medido. Nada es proyección.**
 
-| Ablation (medido en V1) | |
-|---|---|
-| V1 completa | 19/20 |
-| V1 sin L5 | 16/20 |
-| Casos que caen | C045, C051, C060 |
-| Casos con `odo_miles` en holdout | C045, C051, C060 → **coinciden exacto** |
+| | V0 | V1 |
+|---|---|---|
+| Casos resueltos (holdout, 20) | **5/20** | **19/20** |
+| Integridad (2 chequeos de lote) | 0/2 | 0/2 |
+| Lecciones activas | 0 | 9 |
+| Tests de lección verdes | 0/9 | **9/9** |
+| Único caso sin resolver | — | **C056**, VIN duplicado |
+
+### Ablation: cuatro lecciones, cuatro atribuciones exactas
+
+V1 completa: **19/20**. Apagando una sola lección:
+
+| Lección apagada | Marcador | Caen | Casos que caen | Casos con ese defecto en holdout |
+|---|---|---|---|---|
+| **L1** sufijo k en km | 16/20 | 3 | C042, C047, C057 | C042, C047, C057 ✅ |
+| **L2** precio en USD | 16/20 | 3 | C042, C048, C057 | C042, C048, C057 ✅ |
+| **L3** checksum de VIN | 16/20 | 3 | C044, C049, C059 | C044, C049, C059 ✅ |
+| **L5** millas a km | 16/20 | 3 | C045, C051, C060 | C045, C051, C060 ✅ |
+
+**Las cuatro coinciden exacto.** Si el jurado pide otra, se corre en vivo:
+`make ablate L=L4 V=v1`.
 
 ---
 
@@ -165,6 +178,7 @@ Si el tiempo se va, se sacrifica cualquier cosa menos éstas:
 2. **«Se negó a aprender dos fallas porque todavía no podía atribuir la causa.»**
 3. **«Tiramos un 20/20 porque era un número sin evidencia detrás.»**
 4. **«Apago una lección y caen exactamente los tres casos que arreglaba.»**
+5. **«El loop no se quedó sin trabajo: se quedó con una tarea nombrada.»**
 
 ## Para los 2 minutos de preguntas
 
@@ -258,15 +272,21 @@ silencio a que termine de correr).
 ### Tarjeta 5 — La prueba · 0:43
 ⌨️ `make report` → `make ablate L=L5 V=v1`
 
-> V2 hereda once lecciones. **No lee mejor: trabaja mejor** — dejó de duplicar
-> autos y de mentirle al cliente.
+> De cinco a **diecinueve de veinte**, sobre los mismos veinte casos que el
+> sistema nunca vio al aprender.
 >
-> Y la prueba: apago **una sola** lección, la de millas a kilómetros. Baja de
-> diecinueve a dieciséis. **Caen tres casos: C045, C051, C060.** Son
-> exactamente los tres de millas del banco. **Ni uno más.**
+> Y la prueba de que no fue suerte: apago **una sola** lección, la de millas a
+> kilómetros. Baja a dieciséis. **Caen tres casos: C045, C051, C060** — son
+> exactamente los tres casos de millas del banco. **Ni uno más.** Lo
+> verificamos con cuatro lecciones distintas y las cuatro dan atribución
+> exacta.
+>
+> Y el caso que V1 **no** resuelve es el del VIN duplicado: justo una de las
+> dos lecciones que el sistema había diferido. **El loop no se quedó sin
+> trabajo, se quedó con una tarea nombrada.**
 >
 > Codex no fue nuestro copiloto: fue el **órgano de construcción**. Nosotros
-> escribimos el examen y el loop; **V1 y V2 los escribió él.**
+> escribimos el examen y el loop; **V1 lo escribió él.**
 
 ---
 

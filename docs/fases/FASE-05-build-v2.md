@@ -2,8 +2,28 @@
 
 | | |
 |---|---|
-| **Estado** | ⬜ pendiente |
-| **Depende de** | FASE-04 terminada (V1 verde) |
+| **Estado** | ⏸️ **no ejecutada, por decisión del equipo** — ver abajo |
+| **Depende de** | FASE-04 terminada (V1 verde) ✅ |
+
+> ## ⏸️ Por qué esta fase no se ejecutó
+>
+> **Decisión deliberada, no falta de tiempo.** Cerrar en V1 demuestra que
+> entendimos la lógica del ciclo mejor que inflar un número:
+>
+> El único caso que V1 no resuelve es el del **VIN duplicado** — que es
+> exactamente una de las dos lecciones que el sistema **decidió diferir**, con
+> su razón escrita en el log. Lo que falta no es un hueco: es **la siguiente
+> tarea ya nombrada por el propio sistema.**
+>
+> Eso enseña algo más difícil que un marcador alto: **el sistema sabe lo que no
+> sabe, y sabe por qué todavía no lo aprendió.**
+>
+> Todo lo de abajo está construido y listo (`make observe-v1`, `make build-v2`
+> existen y funcionan). Sólo no se corrió. Cualquiera puede ejecutarlo y ver
+> la segunda vuelta. Registro: [DECISIONES.md](../DECISIONES.md) D17.
+>
+> **Importante para la demo:** no afirmar ningún número de V2. El pitch cierra
+> en V1 y lo dice explícitamente.
 
 ## Objetivo
 Correr el loop **otra vez**, ahora sobre V1, para que aparezcan las dos

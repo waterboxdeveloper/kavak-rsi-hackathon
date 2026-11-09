@@ -345,7 +345,10 @@
   <div class="lessons" id="lessons"></div>
   <p class="note">Cada lección existe en tres lugares a la vez: como <strong>regla</strong> legible,
     como <strong>función</strong> ejecutable y como <strong>test</strong> que grita si alguien la rompe.
-    Rojo = el sucesor aún no la hereda. Verde = la heredó.</p>
+    Rojo = el sucesor aún no la hereda. Verde = la heredó.
+    <strong>Ámbar = diferida:</strong> el sistema detectó la falla y decidió no aprenderla todavía,
+    porque con 38 casos de ruido de extracción no podía atribuir la causa.
+    L10 y L11 siguen diferidas: son la tarea que el loop dejó nombrada.</p>
 
   <h3>Qué falla y por qué <span class="badge b-real">V0 medido</span></h3>
   <div class="panel tscroll">
@@ -365,22 +368,22 @@
       <span class="k">V1 completa</span>
       <span class="v">19/20</span>
     </div>
-    <div class="kv">
-      <span class="k">V1 con <strong>L5</strong> apagada <span class="unit">(millas → km)</span></span>
-      <span class="v">16/20 &nbsp;·&nbsp; caen 3</span>
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Lección apagada</th><th class="num">Marcador</th><th class="num">Caen</th><th>Casos que caen</th><th>Casos con ese defecto</th></tr></thead>
+        <tbody>
+          <tr><td><strong>L1</strong> sufijo k en km</td><td class="num">16/20</td><td class="num">3</td><td class="num">C042 C047 C057</td><td class="num">C042 C047 C057 ✓</td></tr>
+          <tr><td><strong>L2</strong> precio en USD</td><td class="num">16/20</td><td class="num">3</td><td class="num">C042 C048 C057</td><td class="num">C042 C048 C057 ✓</td></tr>
+          <tr><td><strong>L3</strong> checksum de VIN</td><td class="num">16/20</td><td class="num">3</td><td class="num">C044 C049 C059</td><td class="num">C044 C049 C059 ✓</td></tr>
+          <tr><td><strong>L5</strong> millas a km</td><td class="num">16/20</td><td class="num">3</td><td class="num">C045 C051 C060</td><td class="num">C045 C051 C060 ✓</td></tr>
+        </tbody>
+      </table>
     </div>
-    <div class="kv">
-      <span class="k">Los 3 que caen</span>
-      <span class="v">C045 · C051 · C060</span>
-    </div>
-    <div class="kv">
-      <span class="k">Casos con defecto <code style="font-family:var(--mono);font-size:12px">odo_miles</code> en el holdout</span>
-      <span class="v">C045 · C051 · C060</span>
-    </div>
-    <p class="note"><strong>Coinciden exactamente: los mismos tres, ni uno más.</strong>
+    <p class="note"><strong>Las cuatro coinciden exacto: los mismos casos, ni uno más.</strong>
       Por eso podemos afirmar que la mejora vino de la lección y no de la suerte.
       Si al apagar una lección cayeran <em>más</em> casos de los que arreglaba, habría
-      acoplamiento entre lecciones: sería un hallazgo real, no un detalle cosmético.</p>
+      acoplamiento entre lecciones: sería un hallazgo real, no un detalle cosmético.
+      Si el jurado pide otra, se corre en vivo: <code style="font-family:var(--mono);font-size:12px">make ablate L=L4 V=v1</code>.</p>
   </div>
 
   <div class="foot">
@@ -402,8 +405,8 @@
     { id: "L7", d: "sufijo k en precio", n: 4 },
     { id: "L8", d: "punto de miles en km", n: 4 },
     { id: "L9", d: "punto de miles en precio", n: 4 },
-    { id: "L10", d: "VIN duplicado", n: 2 },
-    { id: "L11", d: "confirmar tras guardar", n: 2 }
+    { id: "L10", d: "VIN duplicado · DIFERIDA", n: 2 },
+    { id: "L11", d: "confirmar tras guardar · DIFERIDA", n: 2 }
   ];
 
   var DEFECTS = [
@@ -470,18 +473,18 @@
             note: "La integridad sigue en 0/2, y está bien: V1 no sabe nada de las fallas de proceso. El único caso que no resuelve es C056, el del VIN duplicado." }
     },
     {
-      on: ["s-juez", "s-learn"], edges: ["e-fail"],
-      txt: "<strong>Las diferidas despiertan.</strong> Sin el ruido de extracción, las dos fallas de proceso quedan aisladas y ya se pueden atribuir: el mismo VIN dado de alta dos veces, y una confirmación de algo que nunca se guardó. Nacen L10 y L11.",
-      les: "all11",
-      sc: { ver: "V1 medido", real: true, hold: "19<span class='unit'>/20</span>", all: "—", int: "0/2", les: "11",
-            note: "El loop dio su segunda vuelta. Esto es lo que significa «conocimiento acumulado»." }
+      on: ["s-juez"], edges: ["e-hold"],
+      txt: "<strong>El único caso que V1 no resuelve es C056: el del VIN duplicado.</strong> Y es precisamente una de las dos lecciones que el sistema había diferido. Lo que falta no es un hueco: es <code>la siguiente tarea, ya nombrada</code> por el propio sistema y con su razón escrita.",
+      les: "green9",
+      sc: { ver: "V1 medido", real: true, hold: "19<span class='unit'>/20</span>", all: "—", int: "0/2", les: "9",
+            note: "El sistema sabe lo que no sabe, y sabe por qué todavía no lo aprendió. Eso enseña más que un número alto." }
     },
     {
-      on: ["s-build", "s-agente", "s-juez"], edges: ["e-lesson", "e-next", "e-run", "e-hold"],
-      txt: "<strong>V2 hereda las 11.</strong> No lee mejor que V1: <code>trabaja</code> mejor. El salto está en la integridad, 0/2 → 2/2. Y como cada lección tiene interruptor, apagar una sola hace reaparecer exactamente los casos que arreglaba.",
-      les: "green11",
-      sc: { ver: "V2 esperado", real: false, hold: "19<span class='unit'>/20</span>", all: "—", int: "2/2", les: "11",
-            note: "Los 11 tests verdes prueban que V2 conserva las lecciones viejas además de las nuevas." }
+      on: ["s-agente", "s-juez"], edges: ["e-run", "e-hold"],
+      txt: "<strong>La prueba de causalidad.</strong> Apago una sola lección y vuelve a correr el mismo examen: caen exactamente los casos que esa lección arreglaba, ni uno más. Verificado con <code>4 lecciones distintas</code>, las 4 con atribución exacta.",
+      les: "green9",
+      sc: { ver: "V1 sin L5", real: true, hold: "16<span class='unit'>/20</span>", all: "—", int: "0/2", les: "8",
+            note: "Caen C045, C051 y C060 — los tres casos con defecto odo_miles del holdout. Ni uno más." }
     }
   ];
 

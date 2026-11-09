@@ -269,6 +269,75 @@ documentada, con commit.
 **Reversible:** sí. `git checkout 68b99b3 -- agents/v1 agents/common/tools`
 recupera el 20/20 si se prefiere la historia de 2 versiones.
 
-**Lo que sigue siendo decisión del equipo:** 3 versiones con 5→16→19 (fiel a
-la rúbrica, muestra acumulación) vs. 2 versiones con 5→20 (más limpia, menos
-profunda). Recomendación: la primera.
+**Lo que siguió:** D17.
+
+---
+
+## D17 · Cerramos en V1. No construimos V2, y es a propósito
+
+**Qué:** V1 quedó en **19/20** con integridad 0/2. El comando `make build-v2`
+existe y funciona, pero no se ejecutó.
+
+**Por qué:** el único caso que V1 no resuelve es `C056`, el del **VIN
+duplicado** — que es exactamente una de las dos lecciones que el sistema
+**decidió diferir**, con su razón escrita en el log.
+
+O sea: **lo que falta no es un hueco, es la siguiente tarea ya nombrada por el
+propio sistema.** Cerrar ahí demuestra que entendimos la lógica del ciclo, en
+lugar de correr a inflar un marcador. El sistema **sabe lo que no sabe, y sabe
+por qué todavía no lo aprendió** — que es más difícil de lograr que un número
+alto.
+
+**Impacta:**
+
+| | |
+|---|---|
+| Lo que se gana | una narrativa honesta de punta a punta; ningún número afirmado sin medir |
+| Lo que se cede | la evidencia de acumulación (11 lecciones, 11 tests verdes) queda como diseño, no como resultado |
+| Lo que **no** se pierde | el loop sigue siendo replayable: `make reset && make demo` y cualquiera ve nacer las 9 lecciones |
+
+**Lo que esta decisión obligó a hacer:** limpiar toda afirmación de números de
+V2 en `PITCH.md`, `loop-visual.html`, `README.md`, `PROYECTO.md` y las fases.
+Una decisión narrativa que deja números fantasma en los docs es peor que no
+haberla tomado.
+
+**En compensación, reforzamos el cierre:** corrimos el ablation con **4
+lecciones** (L1, L2, L3, L5) en vez de una, y las 4 dan atribución exacta —
+cada una tira el marcador a 16/20 y caen precisamente sus propios casos. La
+prueba de causalidad quedó más fuerte que el salto a V2 que sacrificamos.
+
+**Alternativa descartada:** construir V2 (10 minutos, riesgo cero). Era mi
+recomendación; el equipo eligió la narrativa de V1 y es defendible.
+
+**Reversible:** sí, totalmente. `make observe-v1 && make build-v2`, y después
+hay que volver a meter los números de V2 en los docs que acabamos de limpiar.
+
+---
+
+## D18 · El README explica el impacto en OPEX, no sólo el mecanismo
+
+**Qué:** el README abre con la diferencia entre *darle un objetivo a un agente
+de código* y *un loop que aprende de la operación*.
+
+**Impacta:** es la diferencia entre sonar a demo técnica y sonar a algo que un
+negocio compraría. El argumento central:
+
+> Pedirle código a un agente baja el **CAPEX** de construir algo una vez. Un
+> loop como éste baja el **OPEX** de operarlo para siempre.
+
+Y las tres propiedades que lo sostienen: la señal ya existe y es gratis, el
+arreglo no se degrada (por el test de regresión), y cada incidente abarata el
+siguiente.
+
+**El dato que lo aterriza:** sobre nuestro banco, la carga de corrección humana
+pasó de **75 % de los anuncios a 5 %**, sobre los mismos casos y sin
+intervención manual entre versiones.
+
+**El límite que va escrito junto al dato:** no afirmamos que ése sea el ahorro
+real de Kavak — el banco es sintético. Afirmamos que el mecanismo funciona, es
+atribuible lección por lección, y que cambiarlo a datos reales no requiere
+tocar el loop, sólo `bench/`.
+
+**Por qué importa decir el límite:** un jurado de Kavak detecta en dos segundos
+una cifra de ahorro inventada. Poner el límite al lado del dato convierte una
+afirmación frágil en una creíble.

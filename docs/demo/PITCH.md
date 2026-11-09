@@ -175,3 +175,132 @@ Si el tiempo se va, se sacrifica cualquier cosa menos éstas:
 | ¿Quién decidió la lección? | El repertorio de reglas es nuestro; el sistema elige cuál aplica, a qué casos y **cuándo hay evidencia suficiente** |
 | ¿Dónde hubo intervención humana? | En un punto exacto: endurecer el contrato del constructor tras el V1 que se pasó de listo. Está en el git log |
 | ¿Qué trajeron y qué hicieron hoy? | El repo nació hoy. Sólo `intro.md` es previo |
+
+---
+---
+
+# 🎙️ MODO ENSAYO
+
+## Primero: el guion de arriba NO cabe en 3 minutos
+
+Lo conté. A ritmo de demo (≈140 palabras por minuto en español) el guion
+completo da **488 palabras ≈ 3:28**, más el tiempo que tardan los comandos en
+correr. Nos pasamos entre 30 y 40 segundos, y a los 3:00 cortan.
+
+Así que abajo está la **versión apretada**: las mismas ideas, 180 segundos
+contados. Úsenla para ensayar; la de arriba sirve para entender el contenido.
+
+| Bloque | Palabras | Hablado | + comando | Total |
+|---|---|---|---|---|
+| 1 · Gancho | 68 | 0:29 | — | **0:29** |
+| 2 · La falla | 50 | 0:22 | 0:06 | **0:28** |
+| 3 · Aprende y se niega | 88 | 0:38 | 0:08 | **0:46** |
+| 4 · La confesión | 78 | 0:34 | — | **0:34** |
+| 5 · La prueba | 80 | 0:35 | 0:08 | **0:43** |
+| | **364** | | | **3:00** |
+
+Está al límite. Dos reglas: **nadie improvisa frases nuevas**, y **quien
+teclea lanza el comando mientras el otro sigue hablando** (no esperar en
+silencio a que termine de correr).
+
+---
+
+## 🃏 Tarjetas · sólo lo que se dice
+
+### Tarjeta 1 — Gancho · 0:29
+🖥️ *diagrama del ciclo, paso 1*
+
+> Les voy a decir algo que suena al revés: si un sistema de IA pasa todas sus
+> pruebas en verde a la primera, **no tiene nada que enseñarte**. No sabe qué
+> mejorar.
+>
+> Hoy construimos uno que trata sus propios errores como materia prima. Y para
+> que vean que lo decimos en serio: **tiramos a la basura una versión que sacó
+> veinte de veinte.** Al final les digo por qué.
+
+### Tarjeta 2 — La falla · 0:28
+⌨️ `make v0` *(lanzarlo al empezar a hablar)*
+
+> Kavak recibe anuncios escritos por personas. Este dice **USD catorce mil
+> trescientos**. Nuestro agente lo guardó como catorce mil **pesos**: un auto
+> de doscientos sesenta y cinco mil.
+>
+> Y aquí, **treinta k kilómetros** — registró un Jetta con treinta kilómetros.
+>
+> **Cinco de veinte.** Línea base, mala a propósito.
+
+### Tarjeta 3 — Aprende, y se niega · 0:46
+⌨️ `make observe` → `make learn` → `make test`
+
+> El sistema no dice "falló": dice **qué campo, en qué casos, qué esperaba y
+> qué obtuvo**. Escribió nueve lecciones, cada una con su regla, su función, y
+> **un test que nace rojo**.
+>
+> Y miren esto. También detectó dos fallas más graves: daba de alta el mismo
+> auto dos veces, y le decía "listo" al cliente por algo que nunca se guardó.
+>
+> **Y se negó a aprenderlas.** Textual: *"todavía hay treinta y ocho casos con
+> ruido, no se puede atribuir causa aún"*. Primero limpia, después diagnostica.
+
+### Tarjeta 4 — La confesión · 0:34
+🖥️ `git log --oneline` *(ya en pantalla, no teclear)*
+
+> Codex recibió el código viejo, las nueve lecciones y los nueve tests rojos, y
+> escribió el sucesor completo. Nueve verdes. **Diecinueve de veinte.**
+>
+> Y la confesión: el **primer** V1 que escribió sacó **veinte de veinte**,
+> perfecto. **Lo tiramos.** Arregló además dos bugs cuya lección estaba
+> diferida — y una mejora sin lección **no se puede apagar ni atribuir**.
+>
+> Endurecimos su contrato y reconstruimos. Está en el git log: **ésa fue
+> nuestra intervención humana.**
+
+### Tarjeta 5 — La prueba · 0:43
+⌨️ `make report` → `make ablate L=L5 V=v1`
+
+> V2 hereda once lecciones. **No lee mejor: trabaja mejor** — dejó de duplicar
+> autos y de mentirle al cliente.
+>
+> Y la prueba: apago **una sola** lección, la de millas a kilómetros. Baja de
+> diecinueve a dieciséis. **Caen tres casos: C045, C051, C060.** Son
+> exactamente los tres de millas del banco. **Ni uno más.**
+>
+> Codex no fue nuestro copiloto: fue el **órgano de construcción**. Nosotros
+> escribimos el examen y el loop; **V1 y V2 los escribió él.**
+
+---
+
+## Bitácora de ensayos — llenar a mano
+
+Tres ensayos mínimo, con cronómetro. Si el tercero no baja de 3:00, se recorta
+la tarjeta 3 (es la más larga y la más fácil de apretar).
+
+| # | Tiempo total | Dónde se fue el tiempo | Qué frase se trabó | Ajuste |
+|---|---|---|---|---|
+| 1 | | | | |
+| 2 | | | | |
+| 3 | | | | |
+
+## Reparto
+
+| | Quién | Hace |
+|---|---|---|
+| Voz | | habla las 5 tarjetas, nunca teclea |
+| Manos | | copia y pega los comandos, nunca habla |
+
+## Checklist de 2 minutos antes
+
+- [ ] `make doctor` sin nada en rojo
+- [ ] `make clean && make demo` corre completo
+- [ ] Comandos pegados en un archivo de texto, listos para copiar
+- [ ] Terminal con letra grande, **una** ventana, sin pestañas de más
+- [ ] Pestañas ya abiertas: `lessons/lessons.jsonl`, `tests/test_lesson_L5.py`,
+      `runs/build-prompt-v0-to-v1.md`, `git log --oneline`
+- [ ] Decidido quién es Voz y quién es Manos
+- [ ] Las 4 frases que no se sacrifican, memorizadas
+
+## Si algo truena en vivo
+
+No se depura. Se abre el score guardado en `runs/evidencia/`, se dice *"aquí
+está la corrida de hace un rato"* y se sigue. **Nunca** se pierde el tiempo
+arreglando algo frente al jurado.

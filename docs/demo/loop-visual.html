@@ -1,0 +1,577 @@
+<title>Ciclo de Evals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: hoja de inspeccion vehicular -- franja de encabezado con folio,
+     figura del ciclo a ancho completo, y paneles de datos monoespaciados. */
+  :root {
+    --bg: #f2f1ed;
+    --surface: #fffefb;
+    --ink: #15201f;
+    --muted: #5d6a68;
+    --line: #cbcdc6;
+    --accent: #0d5c5e;
+    --accent-soft: #d9e8e6;
+    --fail: #a32a1e;
+    --fail-soft: #f6e0dc;
+    --pass: #1f6b33;
+    --pass-soft: #dcecdd;
+    --defer: #8a5a08;
+    --defer-soft: #f6e9cf;
+    --display: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --body: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111715;
+      --surface: #1a2220;
+      --ink: #e8eae4;
+      --muted: #9aa8a4;
+      --line: #35403d;
+      --accent: #5ec8c2;
+      --accent-soft: #1d3331;
+      --fail: #f08a7c;
+      --fail-soft: #39211d;
+      --pass: #7cc98c;
+      --pass-soft: #1b3122;
+      --defer: #e0b159;
+      --defer-soft: #33280f;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111715;
+    --surface: #1a2220;
+    --ink: #e8eae4;
+    --muted: #9aa8a4;
+    --line: #35403d;
+    --accent: #5ec8c2;
+    --accent-soft: #1d3331;
+    --fail: #f08a7c;
+    --fail-soft: #39211d;
+    --pass: #7cc98c;
+    --pass-soft: #1b3122;
+    --defer: #e0b159;
+    --defer-soft: #33280f;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .wrap {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 28px 56px;
+  }
+
+  /* --- encabezado tipo folio --- */
+  header { border-top: 3px solid var(--ink); padding-top: 14px; margin-bottom: 30px; }
+  .folio {
+    display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  h1 {
+    font-family: var(--display); font-weight: 700; font-size: clamp(32px, 6vw, 52px);
+    line-height: .98; letter-spacing: -.01em; margin: 10px 0 6px; text-wrap: balance;
+  }
+  .sub { color: var(--muted); max-width: 62ch; margin: 0; }
+
+  /* --- figura --- */
+  figure { margin: 0 0 8px; }
+  .figbox {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 3px;
+    padding: 14px 10px 6px; overflow-x: auto;
+  }
+  svg { display: block; max-width: 100%; height: auto; min-width: 680px; margin: 0 auto; }
+  figcaption { font-size: 13px; color: var(--muted); padding-top: 10px; }
+
+  .st rect { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+  .st .t1 { font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; fill: var(--ink); }
+  .st .t2 { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+  .st.on rect { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2.5; }
+  .st.on .t1 { fill: var(--accent); }
+  .edge { stroke: var(--line); stroke-width: 1.6; fill: none; }
+  .edge.on { stroke: var(--accent); stroke-width: 2.6; }
+  .elabel { font-family: var(--mono); font-size: 10px; fill: var(--muted); letter-spacing: .03em; }
+  .edge.on + .elabel, .elabel.on { fill: var(--accent); }
+  .hold { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 5 4; fill: none; }
+  .hold.on { stroke: var(--accent); }
+  .barrier { stroke: var(--fail); stroke-width: 2; }
+  .st, .edge, .hold, .elabel { transition: all .35s ease; }
+  @media (prefers-reduced-motion: reduce) { .st, .edge, .hold, .elabel { transition: none; } }
+
+  /* --- reproductor --- */
+  .player {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    border: 1px solid var(--line); background: var(--surface);
+    border-radius: 3px; padding: 12px 14px; margin: 18px 0 14px;
+  }
+  button {
+    font-family: var(--display); font-weight: 600; font-size: 15px; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--surface); background: var(--ink);
+    border: 1px solid var(--ink); border-radius: 2px; padding: 7px 16px; cursor: pointer;
+  }
+  button.ghost { background: transparent; color: var(--ink); }
+  button:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ticks { display: flex; gap: 4px; margin-left: auto; }
+  .tick { width: 22px; height: 6px; background: var(--line); border-radius: 1px; border: 0; padding: 0; cursor: pointer; }
+  .tick.done { background: var(--muted); }
+  .tick.now { background: var(--accent); }
+
+  .narr {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 12px 16px; border-radius: 0 3px 3px 0; margin-bottom: 26px;
+  }
+  .narr .step {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 3px;
+  }
+  .narr .txt { margin: 0; }
+  .narr code { font-family: var(--mono); font-size: .92em; background: var(--surface); padding: 1px 5px; border-radius: 2px; }
+
+  /* --- paneles --- */
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+  .panel { border: 1px solid var(--line); background: var(--surface); border-radius: 3px; padding: 16px 18px; min-width: 0; }
+  h2 {
+    font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 12px;
+    padding-bottom: 7px; border-bottom: 1px solid var(--line);
+  }
+  h3 { font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: .02em; margin: 34px 0 14px; }
+
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px dotted var(--line); }
+  .kv:last-child { border-bottom: 0; }
+  .kv .k { color: var(--muted); font-size: 13.5px; }
+  .kv .v { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .big { font-family: var(--mono); font-size: 30px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
+  .unit { font-size: 14px; color: var(--muted); font-weight: 400; }
+
+  .badge {
+    display: inline-block; font-family: var(--mono); font-size: 9.5px; letter-spacing: .08em;
+    text-transform: uppercase; padding: 2px 6px; border-radius: 2px; vertical-align: 2px;
+  }
+  .b-real { background: var(--pass-soft); color: var(--pass); }
+  .b-wait { background: var(--defer-soft); color: var(--defer); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; font-family: var(--mono); font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 400; padding: 0 8px 7px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 7px 8px 7px 0; border-bottom: 1px dotted var(--line); }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .tscroll { overflow-x: auto; }
+
+  .lessons { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .lz {
+    border: 1px solid var(--line); border-left-width: 4px; border-radius: 2px;
+    padding: 8px 10px; background: var(--surface); transition: all .3s ease;
+  }
+  .lz .id { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .lz .d { font-family: var(--mono); font-size: 10px; color: var(--muted); display: block; margin-top: 2px; overflow-wrap: anywhere; }
+  .lz .s { font-family: var(--display); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; float: right; }
+  .lz[data-s="off"] { opacity: .4; border-left-color: var(--line); }
+  .lz[data-s="off"] .s { color: var(--muted); }
+  .lz[data-s="red"] { border-left-color: var(--fail); background: var(--fail-soft); }
+  .lz[data-s="red"] .s { color: var(--fail); }
+  .lz[data-s="green"] { border-left-color: var(--pass); background: var(--pass-soft); }
+  .lz[data-s="green"] .s { color: var(--pass); }
+  .lz[data-s="defer"] { border-left-color: var(--defer); background: var(--defer-soft); }
+  .lz[data-s="defer"] .s { color: var(--defer); }
+  @media (prefers-reduced-motion: reduce) { .lz { transition: none; } }
+
+  .note { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .note strong { color: var(--ink); }
+  .foot { margin-top: 44px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  .foot code { font-family: var(--mono); }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap">
+
+<div class="wrap">
+  <header>
+    <div class="folio">
+      <span>Kavak Listing Autopilot</span><span>RSI Hackathon · 09 nov 2026</span><span>banco v1 · semilla 7</span>
+    </div>
+    <h1>Cómo funcionan las evals</h1>
+    <p class="sub">El ciclo completo, paso a paso: qué examen se aplica, qué parte alimenta el aprendizaje
+      y qué parte sólo mide. Los números de V0 son reales, medidos en este repo.</p>
+  </header>
+
+  <figure>
+    <div class="figbox">
+      <svg viewBox="0 0 920 430" role="img"
+           aria-label="Ciclo de evaluación: los 40 casos de entrenamiento pasan del banco al agente y al juez; las fallas se convierten en lecciones con test, Codex construye la versión siguiente y el ciclo se repite. Los 20 casos apartados van del banco al juez únicamente y nunca llegan a la etapa de aprendizaje.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+        </defs>
+
+        <!-- carril holdout -->
+        <g id="e-hold">
+          <path class="hold" d="M115 74 L115 34 L640 34 L640 74" marker-end="url(#ah)" color="currentColor"/>
+          <text class="elabel" x="377" y="26" text-anchor="middle">20 holdout — sólo para medir, nunca entra al aprendizaje</text>
+          <line class="barrier" x1="700" y1="150" x2="730" y2="180"/>
+          <line class="barrier" x1="730" y1="150" x2="700" y2="180"/>
+          <text class="elabel" x="745" y="169" fill="currentColor">no pasa</text>
+        </g>
+
+        <!-- estaciones -->
+        <g class="st" id="s-banco">
+          <rect x="30" y="74" width="170" height="76" rx="3"/>
+          <text class="t1" x="115" y="104" text-anchor="middle">Banco de casos</text>
+          <text class="t2" x="115" y="124" text-anchor="middle">60 anuncios · 11 defectos</text>
+          <text class="t2" x="115" y="139" text-anchor="middle">40 train / 20 holdout</text>
+        </g>
+        <g class="st" id="s-agente">
+          <rect x="290" y="74" width="170" height="76" rx="3"/>
+          <text class="t1" x="375" y="104" text-anchor="middle">Agente Vn</text>
+          <text class="t2" x="375" y="124" text-anchor="middle">extrae 7 campos</text>
+          <text class="t2" x="375" y="139" text-anchor="middle">da de alta en inventario</text>
+        </g>
+        <g class="st" id="s-juez">
+          <rect x="555" y="74" width="170" height="76" rx="3"/>
+          <text class="t1" x="640" y="104" text-anchor="middle">Juez · scorer</text>
+          <text class="t2" x="640" y="124" text-anchor="middle">campo a campo, sin LLM</text>
+          <text class="t2" x="640" y="139" text-anchor="middle">+ 2 chequeos de lote</text>
+        </g>
+        <g class="st" id="s-learn">
+          <rect x="555" y="290" width="170" height="76" rx="3"/>
+          <text class="t1" x="640" y="320" text-anchor="middle">Lección + test</text>
+          <text class="t2" x="640" y="340" text-anchor="middle">regla · función · test rojo</text>
+          <text class="t2" x="640" y="355" text-anchor="middle">lessons.jsonl</text>
+        </g>
+        <g class="st" id="s-build">
+          <rect x="290" y="290" width="170" height="76" rx="3"/>
+          <text class="t1" x="375" y="320" text-anchor="middle">Codex construye</text>
+          <text class="t2" x="375" y="340" text-anchor="middle">escribe V n+1 completo</text>
+          <text class="t2" x="375" y="355" text-anchor="middle">+ sus herramientas</text>
+        </g>
+
+        <!-- aristas -->
+        <g id="e-feed">
+          <line class="edge" x1="200" y1="112" x2="282" y2="112" marker-end="url(#ah)" color="currentColor"/>
+          <text class="elabel" x="241" y="103" text-anchor="middle">40 train</text>
+        </g>
+        <g id="e-run">
+          <line class="edge" x1="460" y1="112" x2="547" y2="112" marker-end="url(#ah)" color="currentColor"/>
+          <text class="elabel" x="503" y="103" text-anchor="middle">fichas</text>
+        </g>
+        <g id="e-fail">
+          <path class="edge" d="M640 150 L640 282" marker-end="url(#ah)" color="currentColor"/>
+          <text class="elabel" x="650" y="220">fallas agrupadas</text>
+        </g>
+        <g id="e-lesson">
+          <line class="edge" x1="555" y1="328" x2="468" y2="328" marker-end="url(#ah)" color="currentColor"/>
+          <text class="elabel" x="511" y="319" text-anchor="middle">lecciones</text>
+        </g>
+        <g id="e-next">
+          <path class="edge" d="M375 290 L375 158" marker-end="url(#ah)" color="currentColor"/>
+          <text class="elabel" x="385" y="228">V n+1 hereda</text>
+        </g>
+
+        <text class="elabel" x="30" y="408">Ciclo: banco → agente → juez → lección → constructor → agente</text>
+      </svg>
+    </div>
+    <figcaption><strong>Una sola figura, una sola afirmación:</strong> el aprendizaje se alimenta de 40 casos
+      y la calificación se defiende con 20 que el ciclo nunca toca. Esa barrera es la que hace
+      que el número final signifique algo.</figcaption>
+  </figure>
+
+  <div class="player">
+    <button id="play">▶ Reproducir</button>
+    <button class="ghost" id="prev">◀ Atrás</button>
+    <button class="ghost" id="next">Siguiente ▶</button>
+    <div class="ticks" id="ticks"></div>
+  </div>
+
+  <div class="narr">
+    <div class="step" id="n-step">Paso 1 de 9</div>
+    <p class="txt" id="n-txt"></p>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>El examen que se aplica</h2>
+      <div class="kv"><span class="k">Casos totales</span><span class="v">60</span></div>
+      <div class="kv"><span class="k">Train — alimenta el loop</span><span class="v">40</span></div>
+      <div class="kv"><span class="k">Holdout — sólo mide</span><span class="v">20</span></div>
+      <div class="kv"><span class="k">Defectos inyectados</span><span class="v">11 tipos</span></div>
+      <div class="kv"><span class="k">Casos limpios (control)</span><span class="v">15</span></div>
+      <div class="kv"><span class="k">Forma de calificar</span><span class="v">exacta, 7 campos</span></div>
+      <p class="note">Semilla fija: el banco se regenera idéntico siempre
+        (<strong>hash 54b7651…</strong>, verificado dos veces).</p>
+    </div>
+
+    <div class="panel">
+      <h2>Marcador <span id="sc-ver" class="badge b-real">V0 medido</span></h2>
+      <div class="kv">
+        <span class="k">Casos resueltos<br><span class="unit">holdout — el número que se presenta</span></span>
+        <span class="big" id="sc-hold">—</span>
+      </div>
+      <div class="kv"><span class="k">Casos resueltos (los 60)</span><span class="v" id="sc-all">—</span></div>
+      <div class="kv"><span class="k">Chequeos de integridad</span><span class="v" id="sc-int">—</span></div>
+      <div class="kv"><span class="k">Lecciones activas</span><span class="v" id="sc-les">0</span></div>
+      <p class="note" id="sc-note">Todavía no se ha corrido nada.</p>
+    </div>
+  </div>
+
+  <h3>Las lecciones y su candado</h3>
+  <div class="lessons" id="lessons"></div>
+  <p class="note">Cada lección existe en tres lugares a la vez: como <strong>regla</strong> legible,
+    como <strong>función</strong> ejecutable y como <strong>test</strong> que grita si alguien la rompe.
+    Rojo = el sucesor aún no la hereda. Verde = la heredó.</p>
+
+  <h3>Qué falla y por qué <span class="badge b-real">V0 medido</span></h3>
+  <div class="panel tscroll">
+    <table>
+      <thead><tr><th>Defecto inyectado</th><th>Cómo se ve en el anuncio</th><th class="num">V0</th><th>Lección</th></tr></thead>
+      <tbody id="defects"></tbody>
+    </table>
+  </div>
+  <p class="note">Los 15 casos limpios los resuelve todos. Los 45 con defecto, ninguno.
+    <strong>Un perfil de error nítido es lo que permite atribuir cada mejora a su lección.</strong></p>
+
+  <h3>La prueba de causalidad</h3>
+  <div class="panel">
+    <p style="margin-top:0">Cada lección vive detrás de un interruptor en el código, así que se puede apagar una sola
+      y volver a correr el mismo examen:</p>
+    <div class="kv"><span class="k">Apagar <strong>L5</strong> (millas → km)</span><span class="v">vuelven a fallar 8 casos</span></div>
+    <div class="kv"><span class="k">Apagar <strong>L3</strong> (checksum de VIN)</span><span class="v">vuelven a fallar 8 casos</span></div>
+    <div class="kv"><span class="k">Apagar <strong>L9</strong> (punto en el precio)</span><span class="v">vuelven a fallar 4 casos</span></div>
+    <p class="note">Si al apagar una lección se caen <strong>más</strong> casos de los que arreglaba,
+      hay acoplamiento entre lecciones: es un hallazgo real, no un detalle cosmético.
+      Por eso el conteo se verifica contra el banco.</p>
+  </div>
+
+  <div class="foot">
+    Fuentes de los números: <code>runs/v0-all.score.json</code> y <code>runs/v0-holdout.score.json</code>
+    (V0, medidos) · <code>lessons/lessons.jsonl</code> (9 lecciones generadas por <code>loop/learn.py</code>) ·
+    <code>bench/cases.jsonl</code> (60 casos, semilla 7). Las cifras de V1 y V2 están marcadas
+    <span class="badge b-wait">esperado</span> porque esas versiones todavía no se han construido.
+  </div>
+</div>
+
+<script>
+  var LESSONS = [
+    { id: "L1", d: "sufijo k en km", n: 8 },
+    { id: "L2", d: "precio en USD", n: 8 },
+    { id: "L3", d: "checksum de VIN", n: 8 },
+    { id: "L4", d: "salvamento", n: 8 },
+    { id: "L5", d: "millas a km", n: 8 },
+    { id: "L6", d: "año imposible", n: 8 },
+    { id: "L7", d: "sufijo k en precio", n: 4 },
+    { id: "L8", d: "punto de miles en km", n: 4 },
+    { id: "L9", d: "punto de miles en precio", n: 4 },
+    { id: "L10", d: "VIN duplicado", n: 2 },
+    { id: "L11", d: "confirmar tras guardar", n: 2 }
+  ];
+
+  var DEFECTS = [
+    ["odo_k_suffix", "30k kms", "0/8", "L1"],
+    ["price_usd", "USD $14,324", "0/8", "L2"],
+    ["vin_invalid_checksum", "dígito 9 corrupto", "0/8", "L3"],
+    ["salvage_wording", "fue pérdida total", "0/8", "L4"],
+    ["odo_miles", "71,458 mi", "0/8", "L5"],
+    ["year_model_impossible", "Honda City 2011", "0/8", "L6"],
+    ["price_k_suffix", "$93k", "0/4", "L7"],
+    ["odo_dot_sep", "85.000 km", "0/4", "L8"],
+    ["price_dot_sep", "$364.000 MXN", "0/4", "L9"],
+    ["duplicate_vin", "mismo VIN, dos anuncios", "0/2", "L10"],
+    ["write_interrupted", "confirmó sin guardar", "0/2", "L11"],
+    ["(limpio)", "sin defecto — control", "15/15", "—"]
+  ];
+
+  // Cada paso declara el estado completo de la pagina: estaciones encendidas,
+  // aristas encendidas, marcador y estado de cada leccion.
+  var STEPS = [
+    {
+      on: ["s-banco"], edges: [],
+      txt: "<strong>El examen primero.</strong> 60 anuncios de autos usados con la respuesta ya conocida, y con el defecto de cada uno etiquetado. 40 van a alimentar el aprendizaje; <code>20 se apartan</code> y el ciclo no los verá jamás.",
+      les: "off", sc: null
+    },
+    {
+      on: ["s-banco", "s-agente"], edges: ["e-feed"],
+      txt: "<strong>Corre el agente V0.</strong> Su única regla es «agarra el primer número que veas». Lee <code>30k kms</code> y registra un Jetta con 30 kilómetros.",
+      les: "off", sc: null
+    },
+    {
+      on: ["s-agente", "s-juez"], edges: ["e-run", "e-hold"],
+      txt: "<strong>El juez califica.</strong> Comparación exacta campo a campo, cero LLM opinando, más dos chequeos de integridad del lote. Aquí entran también los 20 apartados: <code>sólo para medir</code>.",
+      les: "off",
+      sc: { ver: "V0 medido", real: true, hold: "5<span class='unit'>/20</span>", all: "15/60", int: "0/2", les: "0",
+            note: "Resuelve los 15 casos limpios y ninguno de los 45 con defecto. Línea base perfecta: mala, pero no inútil." }
+    },
+    {
+      on: ["s-juez"], edges: ["e-fail"],
+      txt: "<strong>Observar, no lamentarse.</strong> No dice «falló»: dice qué campo, en qué casos, qué esperaba y qué obtuvo. <code>esperado 30000 → obtenido 30</code>. Ese detalle ya es casi la solución escrita.",
+      les: "off",
+      sc: { ver: "V0 medido", real: true, hold: "5<span class='unit'>/20</span>", all: "15/60", int: "0/2", les: "0",
+            note: "11 grupos de falla, con hasta 3 ejemplos citables cada uno." }
+    },
+    {
+      on: ["s-learn"], edges: ["e-fail"],
+      txt: "<strong>Nacen 9 lecciones, y 2 quedan diferidas.</strong> Cada lección trae regla, la función donde debe vivir, y un test que <code>hoy truena</code>. Las dos de proceso se posponen: con 38 casos de ruido, una falla de integridad podría ser consecuencia y no causa.",
+      les: "learn",
+      sc: { ver: "V0 medido", real: true, hold: "5<span class='unit'>/20</span>", all: "15/60", int: "0/2", les: "0",
+            note: "9 tests en rojo. El sistema sabe 9 cosas y ninguna está implementada." }
+    },
+    {
+      on: ["s-learn", "s-build"], edges: ["e-lesson"],
+      txt: "<strong>Codex construye el sucesor.</strong> Recibe el código de V0, las 9 lecciones y los 9 tests rojos, y escribe V1 completo con sus herramientas. Cada comportamiento queda detrás de <code>if \"Lx\" in lessons</code>.",
+      les: "learn",
+      sc: { ver: "construyendo", real: false, hold: "—", all: "—", int: "—", les: "9",
+            note: "El prompt le prohíbe tocar bench/, lessons/, tests/ y agents/v0/: son la vara de medir." }
+    },
+    {
+      on: ["s-build", "s-agente"], edges: ["e-next", "e-feed", "e-run"],
+      txt: "<strong>V1 corre el mismo examen.</strong> Los 9 tests pasan a verde: el sucesor heredó las lecciones. Y sobre los 20 casos apartados, que nunca entraron al aprendizaje, el marcador sube.",
+      les: "green9",
+      sc: { ver: "V1 esperado", real: false, hold: "16<span class='unit'>/20</span>", all: "—", int: "0/2", les: "9",
+            note: "La integridad sigue en 0/2, y está bien: V1 no sabe nada de las fallas de proceso." }
+    },
+    {
+      on: ["s-juez", "s-learn"], edges: ["e-fail"],
+      txt: "<strong>Las diferidas despiertan.</strong> Sin el ruido de extracción, las dos fallas de proceso quedan aisladas y ya se pueden atribuir: el mismo VIN dado de alta dos veces, y una confirmación de algo que nunca se guardó. Nacen L10 y L11.",
+      les: "all11",
+      sc: { ver: "V1 esperado", real: false, hold: "16<span class='unit'>/20</span>", all: "—", int: "0/2", les: "11",
+            note: "El loop dio su segunda vuelta. Esto es lo que significa «conocimiento acumulado»." }
+    },
+    {
+      on: ["s-build", "s-agente", "s-juez"], edges: ["e-lesson", "e-next", "e-run", "e-hold"],
+      txt: "<strong>V2 hereda las 11.</strong> No lee mejor que V1: <code>trabaja</code> mejor. El salto está en la integridad, 0/2 → 2/2. Y como cada lección tiene interruptor, apagar una sola hace reaparecer exactamente los casos que arreglaba.",
+      les: "green11",
+      sc: { ver: "V2 esperado", real: false, hold: "19<span class='unit'>/20</span>", all: "—", int: "2/2", les: "11",
+            note: "Los 11 tests verdes prueban que V2 conserva las lecciones viejas además de las nuevas." }
+    }
+  ];
+
+  var STATIONS = ["s-banco", "s-agente", "s-juez", "s-learn", "s-build"];
+  var EDGES = ["e-feed", "e-run", "e-fail", "e-lesson", "e-next", "e-hold"];
+  var i = 0, timer = null;
+
+  function lessonState(mode, idx) {
+    if (mode === "off") return "off";
+    if (mode === "learn") return idx < 9 ? "red" : "defer";
+    if (mode === "green9") return idx < 9 ? "green" : "defer";
+    if (mode === "all11") return idx < 9 ? "green" : "red";
+    if (mode === "green11") return "green";
+    return "off";
+  }
+
+  function buildLessons() {
+    var html = "";
+    for (var k = 0; k < LESSONS.length; k++) {
+      html += '<div class="lz" data-s="off" id="lz-' + LESSONS[k].id + '">' +
+        '<span class="s">—</span><span class="id">' + LESSONS[k].id + '</span>' +
+        '<span class="d">' + LESSONS[k].d + ' · ' + LESSONS[k].n + ' casos</span></div>';
+    }
+    document.getElementById("lessons").innerHTML = html;
+  }
+
+  function buildDefects() {
+    var html = "";
+    for (var k = 0; k < DEFECTS.length; k++) {
+      var r = DEFECTS[k];
+      html += "<tr><td><code style='font-family:var(--mono);font-size:12px'>" + r[0] + "</code></td><td>" +
+        r[1] + "</td><td class='num'>" + r[2] + "</td><td class='num'>" + r[3] + "</td></tr>";
+    }
+    document.getElementById("defects").innerHTML = html;
+  }
+
+  function buildTicks() {
+    var html = "";
+    for (var k = 0; k < STEPS.length; k++) {
+      html += '<button class="tick" data-i="' + k + '" aria-label="Paso ' + (k + 1) + '"></button>';
+    }
+    var box = document.getElementById("ticks");
+    box.innerHTML = html;
+    box.addEventListener("click", function (e) {
+      var t = e.target.getAttribute("data-i");
+      if (t !== null) { stop(); i = +t; render(); }
+    });
+  }
+
+  function render() {
+    var s = STEPS[i];
+    for (var k = 0; k < STATIONS.length; k++) {
+      var el = document.getElementById(STATIONS[k]);
+      if (el) el.classList.toggle("on", s.on.indexOf(STATIONS[k]) >= 0);
+    }
+    for (var k = 0; k < EDGES.length; k++) {
+      var g = document.getElementById(EDGES[k]);
+      if (!g) continue;
+      var active = s.edges.indexOf(EDGES[k]) >= 0;
+      var parts = g.querySelectorAll(".edge, .hold, .elabel");
+      for (var j = 0; j < parts.length; j++) parts[j].classList.toggle("on", active);
+    }
+    document.getElementById("n-step").textContent = "Paso " + (i + 1) + " de " + STEPS.length;
+    document.getElementById("n-txt").innerHTML = s.txt;
+
+    for (var k = 0; k < LESSONS.length; k++) {
+      var lz = document.getElementById("lz-" + LESSONS[k].id);
+      if (!lz) continue;
+      var st = lessonState(s.les, k);
+      lz.setAttribute("data-s", st);
+      lz.querySelector(".s").textContent =
+        st === "red" ? "rojo" : st === "green" ? "verde" : st === "defer" ? "diferida" : "—";
+    }
+
+    var sc = s.sc;
+    document.getElementById("sc-hold").innerHTML = sc ? sc.hold : "—";
+    document.getElementById("sc-all").textContent = sc ? sc.all : "—";
+    document.getElementById("sc-int").textContent = sc ? sc.int : "—";
+    document.getElementById("sc-les").textContent = sc ? sc.les : "0";
+    document.getElementById("sc-note").textContent = sc ? sc.note : "Todavía no se ha corrido nada.";
+    var badge = document.getElementById("sc-ver");
+    badge.textContent = sc ? sc.ver : "sin correr";
+    badge.className = "badge " + (sc && sc.real ? "b-real" : "b-wait");
+
+    var ticks = document.querySelectorAll(".tick");
+    for (var k = 0; k < ticks.length; k++) {
+      ticks[k].classList.toggle("done", k < i);
+      ticks[k].classList.toggle("now", k === i);
+    }
+  }
+
+  function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+    document.getElementById("play").textContent = "▶ Reproducir";
+  }
+
+  function start() {
+    if (timer) { stop(); return; }
+    if (i >= STEPS.length - 1) i = -1;
+    document.getElementById("play").textContent = "❙❙ Pausa";
+    timer = setInterval(function () {
+      i++;
+      if (i >= STEPS.length) { i = STEPS.length - 1; stop(); render(); return; }
+      render();
+    }, 4200);
+    i++; if (i >= STEPS.length) i = STEPS.length - 1;
+    render();
+  }
+
+  document.getElementById("play").addEventListener("click", start);
+  document.getElementById("next").addEventListener("click", function () {
+    stop(); if (i < STEPS.length - 1) { i++; render(); }
+  });
+  document.getElementById("prev").addEventListener("click", function () {
+    stop(); if (i > 0) { i--; render(); }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { stop(); if (i < STEPS.length - 1) { i++; render(); } }
+    if (e.key === "ArrowLeft") { stop(); if (i > 0) { i--; render(); } }
+  });
+
+  buildLessons();
+  buildDefects();
+  buildTicks();
+  render();
+</script>

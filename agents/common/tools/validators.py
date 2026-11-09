@@ -1,4 +1,4 @@
-"""Validaciones derivadas de las lecciones de V0."""
+"""Validaciones derivadas de L3, L4 y L6."""
 
 import re
 import unicodedata
@@ -8,33 +8,30 @@ from agents.common.vin import is_valid
 
 
 def vin_flags(vin):
-    """Marca VIN ausente, mal formado o con checksum invalido."""
+    """Emite la bandera de VIN cuando el formato o checksum no es valido."""
     return [] if is_valid(vin) else ["vin_invalid"]
 
 
 def salvage_flags(description):
-    """Detecta lenguaje comun de salvamento y perdida total."""
+    """Detecta lenguaje de salvamento, perdida total o recuperacion."""
     if not description:
         return []
 
-    text = unicodedata.normalize("NFD", str(description).lower())
-    text = "".join(char for char in text if unicodedata.category(char) != "Mn")
+    text = unicodedata.normalize("NFD", str(description).casefold())
+    text = "".join(c for c in text if unicodedata.category(c) != "Mn")
     patterns = (
         r"\bsalvament\w*",
+        r"\bsalvage\b",
         r"\bperdida\s+total\b",
         r"\btitulo\s+de\s+recuperacion\b",
         r"\brehabilitad\w*",
         r"\breconstruid\w*",
-        r"\btotal\s+loss\b",
-        r"\bsalvage\b",
-        r"\brebuilt\b",
-        r"\breconstructed\b",
     )
     return ["salvage"] if any(re.search(pattern, text) for pattern in patterns) else []
 
 
 def year_model_flags(make, model, year):
-    """Marca anos fuera del rango conocido de la generacion del modelo."""
+    """Emite la bandera si el año queda fuera del rango catalogado."""
     if make is None or model is None or year is None:
         return []
     try:

@@ -85,7 +85,8 @@ Un sistema que pasa todo en verde a la primera no tiene nada que enseñarte.
 
 | Si quieres… | Lee |
 |---|---|
-| **entender qué pedo es todo esto, desde cero** | **[docs/ENTENDER.md](docs/ENTENDER.md)** ← empieza aquí |
+| **ver el ciclo de evals funcionando, paso a paso** | **[▶ Recorrido interactivo](https://claude.ai/artifact/VdgCLRpAZNjrDVJQwUuKpW)** — dale *Reproducir* |
+| **entender qué pedo es todo esto, desde cero** | **[docs/ENTENDER.md](docs/ENTENDER.md)** |
 | **nuestra propuesta, con la misma lupa** | [docs/NUESTRA-PROPUESTA.md](docs/NUESTRA-PROPUESTA.md) |
 | dónde sirve este patrón y dónde no (los 5 jueces gratis) | [docs/CASOS-DE-USO.md](docs/CASOS-DE-USO.md) |
 | saber si esto es un estándar, qué docs hay, y Codex vs Claude | [docs/ESTANDARES-Y-HERRAMIENTAS.md](docs/ESTANDARES-Y-HERRAMIENTAS.md) |
@@ -94,6 +95,7 @@ Un sistema que pasa todo en verde a la primera no tiene nada que enseñarte.
 | la rúbrica oficial y cómo le respondemos | [docs/reto/RUBRICA.md](docs/reto/RUBRICA.md) |
 | la guía oficial de la demo, aterrizada | [docs/reto/GUIA-DEMO-OFICIAL.md](docs/reto/GUIA-DEMO-OFICIAL.md) |
 | la bitácora de cada paso con números reales | [docs/fases/](docs/fases/) |
+| compartirlo por correo o LinkedIn | [docs/CORREO.md](docs/CORREO.md) |
 | cómo trabajamos en git sin pisarnos | [docs/git-workflow.md](docs/git-workflow.md) |
 | las reglas del hackathon | [intro.md](intro.md) |
 
@@ -116,7 +118,18 @@ make report     # la tabla comparativa
 El motor de extracción por default es `stub`: regex deterministas, sin red ni
 API key. Para usar un LLM de verdad: `--engine openai` con `OPENAI_API_KEY`.
 
-## El ciclo, en un diagrama
+## El ciclo
+
+### ▶ [Recorrido interactivo del ciclo de evals](https://claude.ai/artifact/VdgCLRpAZNjrDVJQwUuKpW)
+
+Nueve pasos con reproductor: enciende cada estación del loop sobre el diagrama
+mientras el marcador y el estado de las 11 lecciones cambian en vivo
+(🔴 rojo → 🟢 verde → 🟠 diferida). Trae los números medidos de V0 y V1, la
+tabla de los 4 ablations verificados, y deja ver **la barrera que impide que
+los 20 casos apartados entren al aprendizaje** — que es lo que hace que el
+número final signifique algo.
+
+### En texto
 
 ```
    bench/cases.jsonl ──────────┐  (60 casos: 40 train / 20 holdout)

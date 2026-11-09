@@ -338,16 +338,30 @@
   <p class="note">Los 15 casos limpios los resuelve todos. Los 45 con defecto, ninguno.
     <strong>Un perfil de error nítido es lo que permite atribuir cada mejora a su lección.</strong></p>
 
-  <h3>La prueba de causalidad</h3>
+  <h3>La prueba de causalidad <span class="badge b-real">verificado en V1</span></h3>
   <div class="panel">
     <p style="margin-top:0">Cada lección vive detrás de un interruptor en el código, así que se puede apagar una sola
-      y volver a correr el mismo examen:</p>
-    <div class="kv"><span class="k">Apagar <strong>L5</strong> (millas → km)</span><span class="v">vuelven a fallar 8 casos</span></div>
-    <div class="kv"><span class="k">Apagar <strong>L3</strong> (checksum de VIN)</span><span class="v">vuelven a fallar 8 casos</span></div>
-    <div class="kv"><span class="k">Apagar <strong>L9</strong> (punto en el precio)</span><span class="v">vuelven a fallar 4 casos</span></div>
-    <p class="note">Si al apagar una lección se caen <strong>más</strong> casos de los que arreglaba,
-      hay acoplamiento entre lecciones: es un hallazgo real, no un detalle cosmético.
-      Por eso el conteo se verifica contra el banco.</p>
+      y volver a correr el mismo examen. Medido sobre los 20 casos apartados:</p>
+    <div class="kv">
+      <span class="k">V1 completa</span>
+      <span class="v">19/20</span>
+    </div>
+    <div class="kv">
+      <span class="k">V1 con <strong>L5</strong> apagada <span class="unit">(millas → km)</span></span>
+      <span class="v">16/20 &nbsp;·&nbsp; caen 3</span>
+    </div>
+    <div class="kv">
+      <span class="k">Los 3 que caen</span>
+      <span class="v">C045 · C051 · C060</span>
+    </div>
+    <div class="kv">
+      <span class="k">Casos con defecto <code style="font-family:var(--mono);font-size:12px">odo_miles</code> en el holdout</span>
+      <span class="v">C045 · C051 · C060</span>
+    </div>
+    <p class="note"><strong>Coinciden exactamente: los mismos tres, ni uno más.</strong>
+      Por eso podemos afirmar que la mejora vino de la lección y no de la suerte.
+      Si al apagar una lección cayeran <em>más</em> casos de los que arreglaba, habría
+      acoplamiento entre lecciones: sería un hallazgo real, no un detalle cosmético.</p>
   </div>
 
   <div class="foot">
@@ -433,14 +447,14 @@
       on: ["s-build", "s-agente"], edges: ["e-next", "e-feed", "e-run"],
       txt: "<strong>V1 corre el mismo examen.</strong> Los 9 tests pasan a verde: el sucesor heredó las lecciones. Y sobre los 20 casos apartados, que nunca entraron al aprendizaje, el marcador sube.",
       les: "green9",
-      sc: { ver: "V1 esperado", real: false, hold: "16<span class='unit'>/20</span>", all: "—", int: "0/2", les: "9",
-            note: "La integridad sigue en 0/2, y está bien: V1 no sabe nada de las fallas de proceso." }
+      sc: { ver: "V1 medido", real: true, hold: "19<span class='unit'>/20</span>", all: "—", int: "0/2", les: "9",
+            note: "La integridad sigue en 0/2, y está bien: V1 no sabe nada de las fallas de proceso. El único caso que no resuelve es C056, el del VIN duplicado." }
     },
     {
       on: ["s-juez", "s-learn"], edges: ["e-fail"],
       txt: "<strong>Las diferidas despiertan.</strong> Sin el ruido de extracción, las dos fallas de proceso quedan aisladas y ya se pueden atribuir: el mismo VIN dado de alta dos veces, y una confirmación de algo que nunca se guardó. Nacen L10 y L11.",
       les: "all11",
-      sc: { ver: "V1 esperado", real: false, hold: "16<span class='unit'>/20</span>", all: "—", int: "0/2", les: "11",
+      sc: { ver: "V1 medido", real: true, hold: "19<span class='unit'>/20</span>", all: "—", int: "0/2", les: "11",
             note: "El loop dio su segunda vuelta. Esto es lo que significa «conocimiento acumulado»." }
     },
     {

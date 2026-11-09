@@ -4,6 +4,12 @@
 > para construir su siguiente versión.
 > RSI Hackathon · Kavak × OpenAI × Primero AI · 9 nov 2026
 
+> 🧠 **¿Primera vez aquí, o se siente confuso todo este pedo?**
+> Lee [**docs/ENTENDER.md**](docs/ENTENDER.md) antes que nada: explica el
+> sistema desde cero, sin jerga, con los números reales que ya obtuvimos, y
+> cierra con la receta de 6 preguntas para aplicar este patrón a cualquier
+> otro problema. Este archivo (PROYECTO.md) es el mapa; ése es el porqué.
+
 ---
 
 ## 1. Explicado como si tuvieras 5 minutos
@@ -131,8 +137,8 @@ runs/                  trazas y scores (ignoradas por git; evidencia/ sí se ver
 report.py              la tabla comparativa de la demo
 
 docs/
+  ENTENDER.md          el sistema explicado desde cero + cómo reusar el patrón
   fases/FASE-*.md      bitácora: una por fase, con resultados y commits
-  decisiones/ADR-*.md  decisiones de arquitectura y por qué
   demo/guion-3min.md   el guion cronometrado
   git-workflow.md      cómo trabajamos en equipo sin pisarnos
 ```

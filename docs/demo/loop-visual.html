@@ -83,6 +83,17 @@
     line-height: .98; letter-spacing: -.01em; margin: 10px 0 6px; text-wrap: balance;
   }
   .sub { color: var(--muted); max-width: 62ch; margin: 0; }
+  .tesis {
+    margin: 20px 0 0; padding: 16px 20px; max-width: 72ch;
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 4px solid var(--accent); border-radius: 0 3px 3px 0;
+  }
+  .tesis p { margin: 0; font-size: 16px; }
+  .tesis p + p { margin-top: 10px; }
+  .tesis .proof {
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.6;
+    color: var(--muted); padding-top: 10px; border-top: 1px dotted var(--line);
+  }
 
   /* --- figura --- */
   figure { margin: 0 0 8px; }
@@ -200,7 +211,15 @@
     </div>
     <h1>Cómo funcionan las evals</h1>
     <p class="sub">El ciclo completo, paso a paso: qué examen se aplica, qué parte alimenta el aprendizaje
-      y qué parte sólo mide. Los números de V0 son reales, medidos en este repo.</p>
+      y qué parte sólo mide.</p>
+    <div class="tesis">
+      <p>Un sistema que pasa todo en verde a la primera <strong>no tiene nada que enseñarte.</strong>
+      No porque esté mal hecho: porque no sabe qué mejorar. Las fallas no son el accidente
+      del proyecto, son la materia prima.</p>
+      <p class="proof">La prueba de que lo creemos: tiramos a la basura una versión que sacó 20/20,
+      porque había arreglado bugs cuya lección el sistema aún no tenía — y una mejora sin
+      lección que la respalde no se puede apagar ni atribuir.</p>
+    </div>
   </header>
 
   <figure>

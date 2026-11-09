@@ -54,6 +54,27 @@ El dueño de este proyecto pidió explícitamente este estilo de explicación.
     condescendencia: si algo no se entendió, la explicación estaba mal
     escrita, no la persona.
 
+### Avisar cada decisión grande, con su impacto
+
+El dueño del proyecto lo pidió explícitamente: *"cada decisión grande dime qué
+pedo, cómo impacta, quiero tener contexto de todo"*.
+
+Una decisión es **grande** si: cambia un número que vamos a presentar, borra o
+reemplaza trabajo que ya funcionaba, altera la narrativa de la demo, o cierra
+una puerta que después cuesta reabrir.
+
+Cuando ocurra una, decirlo en el momento y con esta estructura:
+
+1. **Qué pasó** — el hecho, con el número.
+2. **Qué impacta** — en la demo, en la rúbrica, en el resto del sistema.
+3. **Qué alternativa se descartó** y por qué.
+4. **Reversible o no** — y si sí, el comando exacto para revertir.
+5. **Qué sigue siendo decisión del equipo**, explícitamente separado de lo ya
+   decidido.
+
+Y registrarla en `docs/DECISIONES.md` con el mismo formato. No narrar como
+grande lo que es rutina: eso es ruido y hace que lo importante se pierda.
+
 ### Lo que NO debe pasar
 
 - Listas de viñetas genéricas que podrían ser de cualquier proyecto.

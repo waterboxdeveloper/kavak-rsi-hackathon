@@ -17,6 +17,9 @@ RSI Hackathon · Kavak × OpenAI × Primero AI · 9 nov 2026
 | dónde sirve este patrón y dónde no (los 5 jueces gratis) | [docs/CASOS-DE-USO.md](docs/CASOS-DE-USO.md) |
 | saber si esto es un estándar, qué docs hay, y Codex vs Claude | [docs/ESTANDARES-Y-HERRAMIENTAS.md](docs/ESTANDARES-Y-HERRAMIENTAS.md) |
 | el mapa del repo y las reglas del proyecto | [PROYECTO.md](PROYECTO.md) |
+| **cada decisión grande y qué impacta** | [docs/DECISIONES.md](docs/DECISIONES.md) |
+| la rúbrica oficial y cómo le respondemos | [docs/reto/RUBRICA.md](docs/reto/RUBRICA.md) |
+| la guía oficial de la demo, aterrizada | [docs/reto/GUIA-DEMO-OFICIAL.md](docs/reto/GUIA-DEMO-OFICIAL.md) |
 | la bitácora de cada paso con números reales | [docs/fases/](docs/fases/) |
 | cómo trabajamos en git sin pisarnos | [docs/git-workflow.md](docs/git-workflow.md) |
 | las reglas del hackathon | [intro.md](intro.md) |

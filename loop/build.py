@@ -59,6 +59,18 @@ CONTRATO = """CONTRATO (obligatorio):
   apagar una leccion y ver reaparecer la falla (ablation).
 - NO modifiques bench/, lessons/, tests/ ni agents/v0/. Son la vara de medir.
 - Solo stdlib de Python. Sin dependencias nuevas.
+
+FRONTERA (igual de obligatoria que el contrato):
+- Implementa UNICAMENTE las lecciones listadas abajo. Nada mas.
+- Si detectas otros bugs en el predecesor, DEJALOS INTACTOS. No son
+  descuidos: son fallas que el sistema todavia no ha aprendido, y arreglarlas
+  antes de que exista su leccion destruye la evidencia. Una mejora sin
+  leccion que la respalde no se puede atribuir ni apagar, o sea que no vale.
+- En particular, conserva EXACTAMENTE el flujo de proceso de {src}: el mismo
+  orden de confirmacion y escritura, y sin deduplicar nada. Aunque veas que
+  esta mal. Lo esta, y es a proposito.
+- Todo comportamiento que agregues debe poder apagarse con su `if "Lx" in
+  lessons:`. Si algo no tiene leccion, no tiene lugar en {to}.
 """
 
 
@@ -92,7 +104,7 @@ def build_prompt(src, dst):
 anuncios de autos usados. Tu trabajo es escribir {dst} a partir de {src} mas las
 lecciones que el sistema aprendio de sus propias corridas.
 
-{CONTRATO.format(to=dst)}
+{CONTRATO.format(to=dst, src=src)}
 
 ## Codigo del predecesor ({src})
 ```python
